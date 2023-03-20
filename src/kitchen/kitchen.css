@@ -1,0 +1,17 @@
+.kitchen-container{
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  /* border: 5px solid red; */
+  justify-content: center;
+  align-items: center;
+  overflow-y: none;
+  overflow-x: none;
+}
+
+.three-js{
+  border: 1px solid red;
+  overflow-y: none;
+  overflow-x: none;
+}

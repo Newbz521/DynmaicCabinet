@@ -1,0 +1,14 @@
+.edit-container{
+  display: flex;
+  left: 0;
+  bottom: 0;
+  position:absolute;
+  height: 20vh;
+  width: 100vw;
+  border:1px solid red;
+  overflow-y: none;
+  overflow-x: none;
+  z-index: 2;
+  justify-content: center;
+  background-color: white;
+}
