@@ -50,7 +50,7 @@ const ThreeScene = (props) => {
   useEffect(() => {
     
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth* 1.5 / window.innerHeight, 0.1, 5000);
     // camera.position.set(-12, 5, 12);
     camera.position.set(-15, 5, 15);
     camera.lookAt( 0, 5.5, 0 );
@@ -58,8 +58,8 @@ const ThreeScene = (props) => {
     camera.updateProjectionMatrix();
     const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-    renderer.setSize(window.innerWidth , window.innerHeight);
-    renderer.setClearColor('white');
+    renderer.setSize(window.innerWidth  , window.innerHeight/1.5);
+    renderer.setClearColor("rgb(246, 243, 243)");
     // renderer.setPixelRatio( window.devicePixelRatio);
 
     renderer.shadowMap.enabled = true;
@@ -70,21 +70,13 @@ const ThreeScene = (props) => {
     sunlight.position.y = 20000;
     sunlight.intensity = 1.5;
     sunlight.castShadow = true;
-    scene.add(sunlight);
+    // scene.add(sunlight);
     const ambientLight = new THREE.AmbientLight(0x333333);
     ambientLight.intensity = 1.2;
     scene.add(ambientLight); 
 
-    const spotLight = new THREE.SpotLight("white");
-    spotLight.position.set(0, 20, 0);
-    spotLight.castShadow = true;
-    spotLight.angle = .5;
-    spotLight.penumbra = .1;
-    spotLight.intensity = 1.5;
-    scene.add(spotLight);
-    
-    
-    const planeGeometry = new THREE.BoxGeometry(kitchenLength, kitchenDepth, 1);
+      
+    const planeGeometry = new THREE.BoxGeometry(kitchenLength * 1.75, kitchenDepth * 1.5, 1);
     const planeMaterial = new THREE.MeshStandardMaterial({
       color: "white",
       wireframe: wired,
@@ -115,7 +107,7 @@ const ThreeScene = (props) => {
     wallOne.castShadow = true;
     scene.add(wallOne); 
 
-    const wallTwoGeometry = new THREE.BoxGeometry(kitchenLength, 10, 1);
+    const wallTwoGeometry = new THREE.BoxGeometry(kitchenLength * 1.75, 10, 1);
     const wallTwoMaterial = new THREE.MeshStandardMaterial({
       color: "white",
       wireframe: wired,
@@ -132,10 +124,12 @@ const ThreeScene = (props) => {
 
     
     const counterGeometry = new THREE.BoxGeometry( kitchenLength, 1.5/12, 2.2 );
-    const counterMaterial = new THREE.MeshMatcapMaterial({
-      color: "grey",
-      side: THREE.DoubleSide,
-      exposure: 1.386,
+    const counterMaterial = new THREE.MeshBasicMaterial({
+      // side: THREE.FrontSide,
+      color: "lightgrey",
+      reflectivity: 1,
+      refractionRatio: .98,
+      // matcap: new THREE.TextureLoader().load('../matcap-textures/matcap-gold.png'),
       wireframe: wired
     });
     const counterTopOne = new THREE.Mesh(counterGeometry, counterMaterial);
@@ -184,7 +178,8 @@ const ThreeScene = (props) => {
     dinnerTable.position.x = kitchenLength/2 - (kitchenLength/2 + 1)
     dinnerTable.position.y = 3 + 1.5/24
     dinnerTable.position.z = kitchenDepth/2 - kitchenDepth/6 
-
+    dinnerTable.receiveShadow = true;
+    dinnerTable.castShadow = true;
     scene.add(dinnerTable)
 
     const dinnerBottomGeometry = new THREE.BoxGeometry( (kitchenLength - 2) - 1.5/12, 3, kitchenDepth /3 - 1  );
@@ -192,6 +187,8 @@ const ThreeScene = (props) => {
     dinnerBottom.position.x = kitchenLength/2 - (kitchenLength/2 + 1 )
     dinnerBottom.position.y = 1.5
     dinnerBottom.position.z = kitchenDepth / 2 - kitchenDepth / 6 - .5
+    dinnerBottom.receiveShadow = true;
+    dinnerBottom.castShadow = true;
     scene.add(dinnerBottom)
 
     const dinnerSideGeometry = new THREE.BoxGeometry( 1.5/12 , 3, kitchenDepth /3  );
@@ -199,7 +196,8 @@ const ThreeScene = (props) => {
     dinnerSide.position.x = -kitchenLength/2  + 1.5/24
     dinnerSide.position.y = 1.5
     dinnerSide.position.z = kitchenDepth/2 - kitchenDepth/6 
-    
+    dinnerSide.receiveShadow = true;
+    dinnerSide.castShadow = true;
     scene.add(dinnerSide)
 
     for (let i = 0; i < cabinets.length; i++){
@@ -230,7 +228,63 @@ const ThreeScene = (props) => {
       upperCabinetDoor.castShadow = true;
       scene.add(upperCabinetDoor)
 
+      const spotLight = new THREE.SpotLight(0xffffff );
+      spotLight.position.set((-kitchenLength / 2 + cabinets[i] / 2) + (i * cabinets[i]), 15, -kitchenDepth/2 + 3);
+      spotLight.target.position.set((-kitchenLength / 2 + cabinets[i] / 2) + (i * cabinets[i]),0,-kitchenDepth/2 + 3);
+      spotLight.castShadow = true;
+      spotLight.angle = .4;
+      spotLight.penumbra = .1;
+      spotLight.intensity = 1;
+      scene.add(spotLight);
+      scene.add(spotLight.target)
+      spotLight.target.updateMatrixWorld();
+      const spotLightHelper = new THREE.SpotLightHelper( spotLight );
+      // scene.add(spotLightHelper);
+      
+      const spotLight2 = new THREE.SpotLight(0xffffff );
+      spotLight2.position.set((-kitchenLength / 2 + cabinets[i] / 2) + (i * cabinets[i]), 15, kitchenDepth/2 );
+      spotLight2.target.position.set((-kitchenLength / 2 + cabinets[i] / 2) + (i * cabinets[i]),0,  kitchenDepth/2 );
+      spotLight2.castShadow = true;
+      spotLight2.angle = .4;
+      spotLight2.penumbra = .1;
+      spotLight2.intensity = 1;
+      scene.add(spotLight2);
+      scene.add(spotLight2.target)
+      spotLight2.target.updateMatrixWorld();
+      const spotLightHelper2 = new THREE.SpotLightHelper( spotLight2 );
+      // scene.add( spotLightHelper2 );
     }
+    const fridgeVolumeGeometry = new THREE.BoxGeometry(40/ 12, 7, 3)
+    const fridgeVolumeMaterial = new THREE.MeshStandardMaterial({
+      color: "silver",
+      wireframe: wired
+    });
+    const fridgeVolume = new THREE.Mesh(fridgeVolumeGeometry, fridgeVolumeMaterial);
+    fridgeVolume.position.y = 3.5;
+    fridgeVolume.position.z = -(kitchenDepth / 2) + .5;
+    fridgeVolume.position.x = (-kitchenLength / 2 - (1.8))
+    scene.add(fridgeVolume)
+
+    const fridgeBottomDoorGeometry = new THREE.BoxGeometry(40/ 12, 2.5, 3/12)
+   
+    const fridgeBottomDoor = new THREE.Mesh(fridgeBottomDoorGeometry, fridgeVolumeMaterial);
+    fridgeBottomDoor.position.y = 2.5/2 + 1/12;
+    fridgeBottomDoor.position.z = -(kitchenDepth / 2) + .5 + 1.5 + 3/24 ;
+    fridgeBottomDoor.position.x = (-kitchenLength / 2 - (1.8) )
+    scene.add(fridgeBottomDoor)
+
+    const fridgeLeftDoorGeometry = new THREE.BoxGeometry(19/ 12, 4.3, 3/12)
+   
+    const fridgeLeftDoor = new THREE.Mesh(fridgeLeftDoorGeometry, fridgeVolumeMaterial);
+    fridgeLeftDoor.position.y = 4/2 + 2.5/2 + 1.6;
+    fridgeLeftDoor.position.z = -(kitchenDepth / 2) + .5 + 1.5 + 3/24 ;
+    fridgeLeftDoor.position.x = (-kitchenLength / 2 - (1.8) - 20 / 24);
+    scene.add(fridgeLeftDoor)
+    const fridgeRightDoor = new THREE.Mesh(fridgeLeftDoorGeometry, fridgeVolumeMaterial);
+    fridgeRightDoor.position.y = 4/2 + 2.5/2 + 1.6;
+    fridgeRightDoor.position.z = -(kitchenDepth / 2) + .5 + 1.5 + 3/24 ;
+    fridgeRightDoor.position.x = (-kitchenLength / 2 - (1.8) + 20 / 24);
+    scene.add(fridgeRightDoor)
 
     const animate = function () {
       requestAnimationFrame(animate);
@@ -239,13 +293,12 @@ const ThreeScene = (props) => {
     }
 
     let onWindowResize = function () {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = window.innerWidth * 1.5 / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize( window.innerWidth , window.innerHeight );
+      renderer.setSize( window.innerWidth , window.innerHeight/ 1.5 );
     }
 
     window.addEventListener("resize", onWindowResize, false);
-
     animate();
 
     return () => mountRef.current.removeChild( renderer.domElement);
