@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import Marble from "./streaked-marble.png"
 import Wenge from "./Wenge.jpeg"
+import Chrome from "./chrome.jpeg"
 import WengeVertical from "./WengeVertical.jpeg"
 import { useEffect, useState, useRef } from "react";
-// import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
 import * as THREE from "three"
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ObjectLoader } from "three";
+
+
+
 const ThreeScene = (props) => {
   const mountRef = useRef(null);
   const [kitchenLength, setKitchenLength] = useState(9);
@@ -15,6 +20,7 @@ const ThreeScene = (props) => {
   const [tableBottomMaterial,setTableBottomMaterial] = useState(Wenge)
   const [toggle, setToggle] = useState(true)
   const [wired, setWired] = useState(false)
+  const [staticIso, setStaticIso] = useState(false)
   const[cam,setCam] = useState(-15)
 
   function divideLength(length, minSectionLength, maxSectionLength) {
@@ -51,28 +57,33 @@ const ThreeScene = (props) => {
       setWired(false)
     }
   }
-
+  function setIso() {
+    setCam(-15)
+  }
+  function setFront() {
+    setCam(0)
+  }
 
 
   useEffect(() => {
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth * 1.5 / window.innerHeight, 0.1, 5000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth * 1.2 / window.innerHeight, 0.1, 5000);
     const loader = new THREE.TextureLoader();
+    const chromeTexture = loader.load(Chrome)
     const marbleTexture = loader.load(tableMaterial);
     const verticalWoodTexture = loader.load(cabinetMaterial)
     const woodTexture = loader.load(tableBottomMaterial);
-    // camera.position.set(-12, 5, 12);
     camera.position.set(cam, 5, 15);
-    // camera.lookAt(0, 5.5, 0);
+    camera.lookAt(0, 5.5, 0);
     // camera.lookAt(scene.position); 
-    camera.up.set( 0, 5.5, 0 );
+    // camera.up.set( 0, 5.5, 0 );
     camera.updateProjectionMatrix();
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio( window.devicePixelRatio );
-    // const controls = new OrbitControls(camera, renderer.domElement);
-    // controls.update();
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.update();
 
-    renderer.setSize(window.innerWidth  , window.innerHeight/1.5);
+    renderer.setSize(window.innerWidth  , window.innerHeight/1.2);
     renderer.setClearColor("rgb(255, 250, 245)");
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -214,6 +225,30 @@ const ThreeScene = (props) => {
     dinnerSide.castShadow = true;
     scene.add(dinnerSide)
 
+    const stoveGeometry = new THREE.BoxGeometry(5, 1.5 / 12, 1.5);
+    const stoveMaterial = new THREE.MeshStandardMaterial({
+      color: "black",
+      wireframe: wired
+    });
+    const stove = new THREE.Mesh(stoveGeometry, stoveMaterial)
+    stove.position.x =  kitchenLength/2 - (bottomLength/2 + 2) 
+    stove.position.z = kitchenDepth / 2 - kitchenDepth / 6 - .75 
+    stove.position.y = 3 + 3/24
+    scene.add(stove)
+
+    const suctionGeometry = new THREE.BoxGeometry(5, 6 / 12, 1.5);
+    const suctionMaterial = new THREE.MeshMatcapMaterial({
+      matcap: chromeTexture,
+      wireframe: wired
+    });
+    const suction = new THREE.Mesh(suctionGeometry, suctionMaterial)
+    suction.position.x =  kitchenLength/2 - (bottomLength/2 + 2) 
+    suction.position.z = kitchenDepth / 2 - kitchenDepth / 6 - .75 
+    suction.position.y = 6
+    suction.receiveShadow = true
+    suction.castShadow = true
+    scene.add(suction)
+
     for (let i = 0; i < cabinets.length; i++){
       const upperCabinetGeometry = new THREE.BoxGeometry(cabinets[i], 4, 1)
       const upperCabinetMaterial = new THREE.MeshStandardMaterial({
@@ -304,29 +339,17 @@ const ThreeScene = (props) => {
     const animate = function () {
       requestAnimationFrame(animate);
       camera.lookAt(0, 5.5, 0);
-      camera.position.set(cam, 5, 15);
+      if (staticIso) {
+        camera.position.set(cam, 5, 15);
+      }
       renderer.render( scene, camera );
     }
     let onWindowResize = function () {
-      camera.aspect = window.innerWidth * 1.5 / window.innerHeight;
+      camera.aspect = window.innerWidth * 1.2 / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize( window.innerWidth , window.innerHeight/ 1.5 );
+      renderer.setSize( window.innerWidth , window.innerHeight/ 1.2 );
     }
-    const camAngleOne = document.getElementById("front-camera")
-
-    function setCameraOne(e) {
-      setCam(0)
-    }
-    const camAngleTwo = document.getElementById("iso-camera")
-
-    function setCameraOne(e) {
-      setCam(0)
-    }
-    function setCameraTwo(e) {
-      setCam(-15)
-    }
-    camAngleOne.addEventListener("click", setCameraOne)
-    camAngleTwo.addEventListener("click", setCameraTwo)
+ 
     window.addEventListener("resize", onWindowResize, false);
     animate();
 
@@ -341,8 +364,8 @@ const ThreeScene = (props) => {
         width
         <input id="depth" type="range" min="9" max="15" defaultValue="6" onInput={getDepth}/> 
         <button onClick={setWire}>WireFrame</button>
-        <button id="front-camera">Front Elevation</button>
-        <button id="iso-camera">Isometric View</button>
+        <button id="front-camera" onClick={setFront}>Front Elevation</button>
+        <button id="iso-camera" onClick={setIso}>Isometric View</button>
       </div>
       <div className="three-js" ref={mountRef}></div>
     </div>
