@@ -5,3 +5,12 @@
   overflow-x: none;
 }
 
+.nav-container{
+  display: flex;
+  position: absolute;
+  width: 100vw;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+

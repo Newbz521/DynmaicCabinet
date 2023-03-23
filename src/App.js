@@ -6,6 +6,7 @@ function App() {
 
   return (
     <div className="App">
+      <nav className='nav-container'>IKYA</nav>
       <Kitchen></Kitchen>
  
     </div>

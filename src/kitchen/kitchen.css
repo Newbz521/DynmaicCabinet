@@ -11,7 +11,10 @@
 }
 
 .three-js{
-  border: 3px solid rgb(208, 248, 250);
+  /* border: 3px solid rgb(208, 248, 250); */
   overflow-y: none;
   overflow-x: none;
+}
+button{
+  height: 20%;
 }
