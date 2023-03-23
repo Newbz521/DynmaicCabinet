@@ -3,10 +3,8 @@ import Marble from "./streaked-marble.png"
 import Wenge from "./Wenge.jpeg"
 import WengeVertical from "./WengeVertical.jpeg"
 import { useEffect, useState, useRef } from "react";
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js";
-import { OBJLoader } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/OBJLoader.js";
-
+// import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
+import * as THREE from "three"
 const ThreeScene = (props) => {
   const mountRef = useRef(null);
   const [kitchenLength, setKitchenLength] = useState(9);
